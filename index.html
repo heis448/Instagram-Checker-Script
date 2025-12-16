@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An0nOtF Instagram Checker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #E50914 0%, #B81D24 100%);
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            left: -250px;
+            top: 0;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: linear-gradient(45deg, #E50914, #B81D24);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            cursor: pointer !important;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .menu {
+            list-style: none;
+        }
+
+        .menu li {
+            margin-bottom: 15px;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            cursor: pointer !important;
+        }
+
+        .menu a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .menu i {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .telegram-btn {
+            background: #0088cc;
+            margin-top: 20px;
+        }
+
+        .contact-btn {
+            background: #333;
+            margin-top: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 30px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-open {
+            margin-left: 250px;
+        }
+
+        .header {
+            margin-bottom: 40px;
+            text-align: center;
+            padding-top: 20px;
+        }
+
+        .header h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #E50914, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card .count {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-card.success .count {
+            color: #2ecc71;
+        }
+
+        .stat-card.failed .count {
+            color: #e74c3c;
+        }
+
+        .stat-card.error .count {
+            color: #f1c40f;
+        }
+
+        .stat-card.progress .count {
+            color: #3498db;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #E50914, #ffd700);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* Input Area */
+        .input-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-area textarea {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            color: #fff;
+            font-size: 14px;
+            resize: vertical;
+            font-family: monospace;
+            margin-bottom: 20px;
+        }
+
+        /* Control Buttons */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer !important;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #E50914, #B81D24);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #f1c40f, #f39c12);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .results-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .results-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            margin-bottom: 15px;
+            max-height: 300px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .result-item.success {
+            border-left-color: #2ecc71;
+            background: rgba(46, 204, 113, 0.05);
+        }
+
+        .result-item.failed {
+            border-left-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.05);
+        }
+
+        .result-item.error {
+            border-left-color: #f1c40f;
+            background: rgba(241, 196, 15, 0.05);
+        }
+
+        .copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer !important;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+            display: block;
+        }
+
+        .toast.error {
+            background: #e74c3c;
+        }
+
+        .toast.warning {
+            background: #f39c12;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(229, 9, 20, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(229, 9, 20, 0.1);
+        }
+
+        .modal-header h2 {
+            background: linear-gradient(45deg, #E50914, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            color: #E50914;
+        }
+
+        .modal-body {
+            padding: 25px;
+        }
+
+        .modal-body h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-body h4 {
+            color: #E50914;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid rgba(229, 9, 20, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .features ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .features li:before {
+            content: "✓";
+            color: #2ecc71;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .developer-info p, .disclaimer p, .contact p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .disclaimer {
+            background: rgba(241, 196, 15, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f1c40f;
+        }
+
+        .contact a {
+            color: #0088cc;
+            text-decoration: none;
+        }
+
+        .contact a:hover {
+            text-decoration: underline;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: right;
+        }
+
+        /* Loading Indicator */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Statistics Modal Styles */
+        .stats-dashboard {
+            max-height: 60vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .stats-dashboard::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .stats-dashboard::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        .stats-dashboard::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #E50914, #B81D24);
+            border-radius: 4px;
+        }
+
+        /* Quick Stats Grid */
+        .quick-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .quick-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .quick-stat:hover {
+            transform: translateY(-3px);
+            border-color: rgba(229, 9, 20, 0.3);
+        }
+
+        .quick-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .quick-content {
+            flex: 1;
+        }
+
+        .quick-content h4 {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-weight: normal;
+        }
+
+        .quick-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .quick-content small {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Detailed Statistics */
+        .stats-detailed {
+            margin: 30px 0;
+        }
+
+        .stats-detailed h3 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .daily-stats, .weekly-stats, .alltime-stats {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .daily-stats {
+            border-left-color: #2ecc71;
+        }
+
+        .weekly-stats {
+            border-left-color: #3498db;
+        }
+
+        .alltime-stats {
+            border-left-color: #9b59b6;
+        }
+
+        .daily-stats h4, .weekly-stats h4, .alltime-stats h4 {
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .daily-grid, .weekly-grid, .alltime-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .daily-item, .weekly-item, .alltime-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .daily-label, .weekly-label, .alltime-label {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .daily-value, .weekly-value, .alltime-value {
+            color: #fff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Real-time Updates */
+        .realtime-updates {
+            background: rgba(241, 196, 15, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 1px solid rgba(241, 196, 15, 0.2);
+        }
+
+        .realtime-updates h4 {
+            color: #f1c40f;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .update-info {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .update-info p {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ddd;
+            font-size: 14px;
+        }
+
+        .update-info i {
+            font-size: 8px;
+        }
+
+        /* Modal Footer Buttons */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-footer .btn {
+            min-width: 120px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 20px;
+                padding-top: 80px;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                min-width: unset;
+            }
+            
+            .quick-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .daily-grid, .weekly-grid, .alltime-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-footer {
+                flex-direction: column;
+            }
+            
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo">
+            <h1>An0nOtF</h1>
+            <span>Instagram Checker</span>
+        </div>
+        <ul class="menu">
+            <li><a href="#" id="dashboardBtn"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="#" id="statisticsBtn"><i class="fas fa-chart-line"></i> Statistics</a></li>
+            <li><a href="#" id="aboutBtn"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="https://t.me/+NTvpFvT6cA8yODM0" class="telegram-btn" target="_blank">
+                <i class="fab fa-telegram"></i> Join Telegram
+            </a></li>
+            <li><a href="https://t.me/unknownnumeralx" class="contact-btn" target="_blank">
+                <i class="fas fa-user"></i> Contact Developer
+            </a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h2>An0nOtF Instagram Account Checker</h2>
+            <p>Check multiple Instagram accounts simultaneously with real-time progress tracking</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            <div class="stat-card progress">
+                <h3>Progress</h3>
+                <div class="count" id="progressCount">0/0</div>
+                <div id="progressPercent">0%</div>
+                <div id="statusText">Ready</div>
+            </div>
+            <div class="stat-card success">
+                <h3>Hits</h3>
+                <div class="count" id="successCount">0</div>
+            </div>
+            <div class="stat-card failed">
+                <h3>Declined</h3>
+                <div class="count" id="failedCount">0</div>
+            </div>
+            <div class="stat-card error">
+                <h3>Errors</h3>
+                <div class="count" id="errorCount">0</div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <h3>Processing Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <h3>Enter Instagram Accounts (username:password)</h3>
+            <textarea id="accountsInput" placeholder="Enter accounts in format:
+username1:password1
+username2:password2
+username3:password3"></textarea>
+            
+            <div class="controls">
+                <button class="btn btn-primary" id="startBtn">
+                    <i class="fas fa-play"></i> Start Checking
+                </button>
+                <button class="btn btn-success" id="downloadBtn">
+                    <i class="fas fa-download"></i> Download Results
+                </button>
+                <button class="btn btn-warning" id="stopBtn" disabled>
+                    <i class="fas fa-stop"></i> Stop
+                </button>
+                <button class="btn btn-danger" id="clearBtn">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+        </div>
+
+<!-- Results Section -->
+        <div class="results-section">
+            <div class="results-panel">
+                <h3 style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Hits Terminal ✅</h3>
+                <div class="results-list" id="successResults">
+                    <div class="result-item success">
+                        No successful logins yet
+                    </div>
+                        <div class="caption">Premium Config by An0nOtF Technologies Inc 💎</div>
+                </div>
+                <button class="copy-btn" id="copySuccessBtn">
+                    <i class="fas fa-copy"></i> Copy Hits
+                </button>
+            </div>
+
+            <div class="results-panel">
+                <h3 style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Declined Terminal ❌</h3>
+                <div class="results-list" id="failedResults">
+                    <div class="result-item failed">
+                        No failed logins yet
+                     </div>
+                        <div class="caption">Premium Config by An0nOtF Technologies Inc 💎</div>
+                    </div>
+                </div>
+                <button class="copy-btn" id="copyFailedBtn">
+                    <i class="fas fa-copy"></i> Copy Declined
+                </button>
+            </div>
+
+            <div class="results-panel">
+                <h3 style="color: #f1c40f;"><i class="fas fa-exclamation-triangle"></i> Error Terminal ⚠️</h3>
+                <div class="results-list" id="errorResults">
+                    <div class="result-item error">
+                        No errors yet
+                     </div>
+                        <div class="caption">Premium Config by An0nOtF Technologies Inc 💎</div>
+                    </div>
+                </div>
+                <button class="copy-btn" id="copyErrorBtn">
+                    <i class="fas fa-copy"></i> Copy Errors
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>© 2025 <strong>An0nOtF Technologies Inc</strong> | All rights reserved</p>
+            <p>Premium Config by Tylor..... ✅ An0nOtF Technologies Inc</p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- About Modal -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>About Instagram Checker</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>An0nOtF Instagram Checker v1.0</h3>
+                <p>A powerful tool for checking Instagram account credentials with real-time progress tracking.</p>
+                
+                <div class="features">
+                    <h4>Features:</h4>
+                    <ul>
+                        <li>Multi-account simultaneous checking</li>
+                        <li>Real-time progress tracking</li>
+                        <li>Detailed statistics and results</li>
+                        <li>Download results in multiple formats</li>
+                    </ul>
+                </div>
+                
+                <div class="developer-info">
+                    <h4>Developer:</h4>
+                    <p><strong>An0nOtF Technologies Inc💎</strong></p>
+                    <p>Premium tools and configurations for digital security testing are available on our Telegram Channel.</p>
+                </div>
+                
+                <div class="disclaimer">
+                    <h4>Disclaimer:</h4>
+                    <p>This tool is for <strong>NOT FOR EDUCATIONAL PURPOSES,, BUT ©️ COPYRIGHT IS RESTRICTED ⚠️ ⚠️ </strong>. Enjoy Premium Configs💎.</p>
+                    <p>Unauthorized COPYRIGHT IS NOT ALLOWED.</p>
+                </div>
+                
+                <div class="contact">
+                    <h4>Contact:</h4>
+                    <p>Telegram: <a href="https://t.me/unknownnumeralx" target="_blank">@unknownnumeralx</a></p>
+                    <p>Channel: <a href="https://t.me/+-qeY7LpUaTs4YTJk" target="_blank">Join Telegram Channel</a></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div id="statisticsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-line"></i> Real-Time Statistics</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Live Statistics Dashboard -->
+                <div class="stats-dashboard">
+                    <!-- Quick Overview -->
+                    <div class="stats-quick">
+                        <h3><i class="fas fa-tachometer-alt"></i> Quick Overview</h3>
+                        <div class="quick-stats-grid">
+                            <div class="quick-stat">
+                                <div class="quick-icon" style="background: linear-gradient(45deg, #E50914, #ffd700);">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="quick-content">
+                                    <h4>Total Visitors</h4>
+                                    <div class="quick-number" id="modalTotalVisitors">1</div>
+                                    <small>Unique visitors</small>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-stat">
+                                <div class="quick-icon" style="background: linear-gradient(45deg, #2ecc71, #27ae60);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="quick-content">
+                                    <h4>Total Checked</h4>
+                                    <div class="quick-number" id="modalTotalChecked">0</div>
+                                    <small>All-time accounts</small>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-stat">
+                                <div class="quick-icon" style="background: linear-gradient(45deg, #3498db, #2980b9);">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div class="quick-content">
+                                    <h4>Active Now</h4>
+                                    <div class="quick-number" id="modalActiveNow">1</div>
+                                    <small>Current sessions</small>
+                                </div>
+                            </div>
+                            
+                            <div class="quick-stat">
+                                <div class="quick-icon" style="background: linear-gradient(45deg, #9b59b6, #8e44ad);">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="quick-content">
+                                    <h4>Session Time</h4>
+                                    <div class="quick-number" id="modalSessionTime">0m</div>
+                                    <small>Your current session</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed Statistics -->
+                    <div class="stats-detailed">
+                        <h3><i class="fas fa-chart-bar"></i> Detailed Statistics</h3>
+                        
+                        <!-- Daily Statistics -->
+                        <div class="daily-stats">
+                            <h4><i class="fas fa-calendar-day"></i> Today's Activity</h4>
+                            <div class="daily-grid">
+                                <div class="daily-item">
+                                    <span class="daily-label">Checked Today:</span>
+                                    <span class="daily-value" id="modalTodayChecked">0</span>
+                                </div>
+                                <div class="daily-item">
+                                    <span class="daily-label">Hits Today:</span>
+                                    <span class="daily-value" id="modalTodayHits">0</span>
+                                </div>
+                                <div class="daily-item">
+                                    <span class="daily-label">Visitors Today:</span>
+                                    <span class="daily-value" id="modalTodayVisitors">1</span>
+                                </div>
+                                <div class="daily-item">
+                                    <span class="daily-label">Avg. Time:</span>
+                                    <span class="daily-value" id="modalAvgTime">0s</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Weekly Statistics -->
+                        <div class="weekly-stats">
+                            <h4><i class="fas fa-calendar-week"></i> This Week</h4>
+                            <div class="weekly-grid">
+                                <div class="weekly-item">
+                                    <span class="weekly-label">Accounts Checked:</span>
+                                    <span class="weekly-value" id="modalWeekChecked">0</span>
+                                </div>
+                                <div class="weekly-item">
+                                    <span class="weekly-label">Successful Hits:</span>
+                                    <span class="weekly-value" id="modalWeekHits">0</span>
+                                </div>
+                                <div class="weekly-item">
+                                    <span class="weekly-label">Total Visitors:</span>
+                                    <span class="weekly-value" id="modalWeekVisitors">1</span>
+                                </div>
+                                <div class="weekly-item">
+                                    <span class="weekly-label">Success Rate:</span>
+                                    <span class="weekly-value" id="modalSuccessRate">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- All-Time Statistics -->
+                        <div class="alltime-stats">
+                            <h4><i class="fas fa-history"></i> All-Time Records</h4>
+                            <div class="alltime-grid">
+                                <div class="alltime-item">
+                                    <span class="alltime-label">Total Accounts Checked:</span>
+                                    <span class="alltime-value" id="modalAllTimeChecked">0</span>
+                                </div>
+                                <div class="alltime-item">
+                                    <span class="alltime-label">Total Successful Logins:</span>
+                                    <span class="alltime-value" id="modalAllTimeHits">0</span>
+                                </div>
+                                <div class="alltime-item">
+                                    <span class="alltime-label">Total Visitors:</span>
+                                    <span class="alltime-value" id="modalAllTimeVisitors">1</span>
+                                </div>
+                                <div class="alltime-item">
+                                    <span class="alltime-label">Overall Success Rate:</span>
+                                    <span class="alltime-value" id="modalOverallRate">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Real-time Updates -->
+                    <div class="realtime-updates">
+                        <h4><i class="fas fa-sync-alt"></i> Live Updates</h4>
+                        <div class="update-info">
+                            <p><i class="fas fa-circle" style="color: #2ecc71;"></i> Updates every <strong>5 seconds</strong></p>
+                            <p><i class="fas fa-circle" style="color: #3498db;"></i> Last updated: <span id="lastUpdateTime">Just now</span></p>
+                            <p><i class="fas fa-circle" style="color: #f1c40f;"></i> Data stored locally in your browser</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="refreshModalBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh Now
+                </button>
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        let updateInterval = null;
+        let isProcessing = false;
+        let statsUpdateInterval = null;
+
+        // Toast notification function
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Test backend connection on load
+        function checkBackendConnection() {
+            fetch('/')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ Backend connected');
+                        document.getElementById('statusText').textContent = 'Ready - Connected';
+                    } else {
+                        console.error('❌ Backend not responding');
+                        document.getElementById('statusText').textContent = 'Error - Backend offline';
+                        showToast('Cannot connect to backend server!', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Cannot connect to backend:', error);
+                    document.getElementById('statusText').textContent = 'Error - Cannot connect';
+                    showToast('Cannot connect to backend server!\nMake sure Flask is running.', 'error');
+                });
+        }
+
+        // Statistics tracking and modal functions
+        // Track visitor with session time
+        function trackVisitorWithSession() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const visitorId = 'visitor_' + Math.random().toString(36).substr(2, 9);
+            
+            // Get or initialize visitor stats
+            let visitorStats = JSON.parse(localStorage.getItem('ig_checker_visitor_stats') || '{}');
+            
+            // Check if new visitor
+            if (!visitorStats.visitorId) {
+                visitorStats.visitorId = visitorId;
+                visitorStats.firstVisit = now.getTime();
+                visitorStats.totalVisitors = 1;
+                visitorStats.dailyVisitors = 1;
+            } else {
+                visitorStats.totalVisitors = (visitorStats.totalVisitors || 1) + 1;
+                
+                // Check if new day
+                if (visitorStats.lastVisitDate !== today) {
+                    visitorStats.dailyVisitors = (visitorStats.dailyVisitors || 0) + 1;
+                    visitorStats.lastVisitDate = today;
+                }
+            }
+            
+            // Track session
+            visitorStats.currentSessionStart = now.getTime();
+            visitorStats.lastActive = now.getTime();
+            
+            // Track active sessions
+            visitorStats.activeSessions = visitorStats.activeSessions || [];
+            visitorStats.activeSessions.push({
+                startTime: now.getTime(),
+                visitorId: visitorId
+            });
+            
+            // Clean up old sessions (older than 30 minutes)
+            const thirtyMinutesAgo = now.getTime() - (30 * 60 * 1000);
+            visitorStats.activeSessions = visitorStats.activeSessions.filter(
+                session => session.startTime > thirtyMinutesAgo
+            );
+            
+            // Save stats
+            localStorage.setItem('ig_checker_visitor_stats', JSON.stringify(visitorStats));
+            
+            return visitorStats;
+        }
+
+        // Update statistics in modal
+        function updateModalStatistics() {
+            const now = new Date();
+            const visitorStats = JSON.parse(localStorage.getItem('ig_checker_visitor_stats') || '{}');
+            const checkStats = JSON.parse(localStorage.getItem('ig_checker_stats') || '{}');
+            
+            // Calculate session time
+            const sessionStart = visitorStats.currentSessionStart || now.getTime();
+            const sessionMinutes = Math.floor((now.getTime() - sessionStart) / 60000);
+            
+            // Update modal values
+            document.getElementById('modalTotalVisitors').textContent = visitorStats.totalVisitors || '1';
+            document.getElementById('modalTotalChecked').textContent = checkStats.totalChecked || '0';
+            document.getElementById('modalActiveNow').textContent = visitorStats.activeSessions ? visitorStats.activeSessions.length : '1';
+            document.getElementById('modalSessionTime').textContent = `${sessionMinutes}m`;
+            
+            // Today's stats
+            document.getElementById('modalTodayChecked').textContent = checkStats.todayChecked || '0';
+            document.getElementById('modalTodayHits').textContent = checkStats.todaySuccess || '0';
+            document.getElementById('modalTodayVisitors').textContent = visitorStats.dailyVisitors || '1';
+            document.getElementById('modalAvgTime').textContent = checkStats.avgCheckTime ? checkStats.avgCheckTime + 's' : '0s';
+            
+            // Weekly stats
+            document.getElementById('modalWeekChecked').textContent = checkStats.weekChecked || '0';
+            document.getElementById('modalWeekHits').textContent = checkStats.weekSuccess || '0';
+            document.getElementById('modalWeekVisitors').textContent = visitorStats.weeklyVisitors || '1';
+            
+            // Calculate success rate
+            const total = checkStats.totalChecked || 0;
+            const success = checkStats.totalSuccess || 0;
+            const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+            document.getElementById('modalSuccessRate').textContent = `${successRate}%`;
+            
+            // All-time stats
+            document.getElementById('modalAllTimeChecked').textContent = checkStats.totalChecked || '0';
+            document.getElementById('modalAllTimeHits').textContent = checkStats.totalSuccess || '0';
+            document.getElementById('modalAllTimeVisitors').textContent = visitorStats.totalVisitors || '1';
+            document.getElementById('modalOverallRate').textContent = `${successRate}%`;
+            
+            // Update time
+            const timeString = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('lastUpdateTime').textContent = timeString;
+        }
+
+        // Start real-time statistics updates
+        function startStatsUpdates() {
+            if (statsUpdateInterval) {
+                clearInterval(statsUpdateInterval);
+            }
+            
+            // Update immediately
+            updateModalStatistics();
+            
+            // Update every 5 seconds
+            statsUpdateInterval = setInterval(updateModalStatistics, 5000);
+        }
+
+        // Stop statistics updates
+        function stopStatsUpdates() {
+            if (statsUpdateInterval) {
+                clearInterval(statsUpdateInterval);
+                statsUpdateInterval = null;
+            }
+        }
+
+        // Reset statistics
+        function resetStatistics() {
+            if (confirm('Are you sure you want to reset all statistics? This cannot be undone!')) {
+                localStorage.removeItem('ig_checker_stats');
+                localStorage.removeItem('ig_checker_visitor_stats');
+                
+                // Reinitialize with current visitor
+                trackVisitorWithSession();
+                updateModalStatistics();
+                
+                showToast('Statistics reset successfully!', 'success');
+            }
+        }
+
+        // Initialize statistics tab
+        function initializeStatisticsTab() {
+            const statisticsBtn = document.getElementById('statisticsBtn');
+            const statisticsModal = document.getElementById('statisticsModal');
+            const refreshModalBtn = document.getElementById('refreshModalBtn');
+            const resetStatsBtn = document.getElementById('resetStatsBtn');
+            
+            if (statisticsBtn) {
+                statisticsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Close sidebar
+                    const sidebar = document.getElementById('sidebar');
+                    const mainContent = document.getElementById('mainContent');
+                    if (sidebar) sidebar.classList.remove('open');
+                    if (mainContent) mainContent.classList.remove('sidebar-open');
+                    
+                    // Show statistics modal
+                    if (statisticsModal) {
+                        statisticsModal.classList.add('show');
+                        
+                        // Start real-time updates
+                        startStatsUpdates();
+                        
+                        // Setup close buttons
+                        const closeButtons = statisticsModal.querySelectorAll('.close-modal');
+                        closeButtons.forEach(button => {
+                            button.addEventListener('click', function() {
+                                statisticsModal.classList.remove('show');
+                                stopStatsUpdates();
+                            });
+                        });
+                        
+                        // Close modal when clicking outside
+                        statisticsModal.addEventListener('click', function(e) {
+                            if (e.target === statisticsModal) {
+                                statisticsModal.classList.remove('show');
+                                stopStatsUpdates();
+                            }
+                        });
+                        
+                        // Close with Escape key
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape' && statisticsModal.classList.contains('show')) {
+                                statisticsModal.classList.remove('show');
+                                stopStatsUpdates();
+                            }
+                        });
+                    }
+                });
+            }
+            
+            // Refresh button in modal
+            if (refreshModalBtn) {
+                refreshModalBtn.addEventListener('click', function() {
+                    updateModalStatistics();
+                    showToast('Statistics refreshed!', 'success');
+                    
+                    // Animate refresh button
+                    refreshModalBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+                    setTimeout(() => {
+                        refreshModalBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Now';
+                    }, 1000);
+                });
+            }
+            
+            // Reset statistics button
+            if (resetStatsBtn) {
+                resetStatsBtn.addEventListener('click', resetStatistics);
+            }
+        }
+
+        function startChecking() {
+            console.log('Start button clicked');
+            
+            const accountsInput = document.getElementById('accountsInput').value.trim();
+            
+            if (!accountsInput) {
+                showToast('Please enter some accounts to check!', 'warning');
+                return;
+            }
+            
+            // Disable start button and enable stop button
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('statusText').textContent = 'Sending to server...';
+            
+            fetch('/upload_accounts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'accounts=' + encodeURIComponent(accountsInput)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Server response:', data);
+                if (data.error) {
+                    showToast('Error: ' + data.error, 'error');
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                } else {
+                    isProcessing = true;
+                    document.getElementById('statusText').textContent = 'Processing...';
+                    startProgressUpdates();
+                    showToast(`Started checking ${data.total} accounts!`, 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting check:', error);
+                showToast('Failed to connect to server!', 'error');
+                document.getElementById('startBtn').disabled = false;
+                document.getElementById('stopBtn').disabled = true;
+                document.getElementById('statusText').textContent = 'Error - Try again';
+            });
+        }
+
+        function stopChecking() {
+            console.log('Stop button clicked');
+            
+            if (!isProcessing) {
+                showToast('No checking process is currently running.', 'warning');
+                return;
+            }
+            
+            fetch('/stop_processing')
+                .then(response => response.json())
+                .then(data => {
+                    isProcessing = false;
+                    document.getElementById('startBtn').disabled = false;
+                    document.getElementById('stopBtn').disabled = true;
+                    document.getElementById('statusText').textContent = 'Stopped';
+                    if (updateInterval) {
+                        clearInterval(updateInterval);
+                        updateInterval = null;
+                    }
+                    showToast('Checking stopped!', 'warning');
+                    updateResults();
+                })
+                .catch(error => {
+                    console.error('Error stopping process:', error);
+                    showToast('Error stopping the process.', 'error');
+                });
+        }
+
+        function clearAll() {
+            console.log('Clear button clicked');
+            
+            if (confirm('Are you sure you want to clear all results? This will reset everything.')) {
+                fetch('/clear_results')
+                    .then(response => response.json())
+                    .then(data => {
+                        updateResults();
+                        updateProgress();
+                        document.getElementById('accountsInput').value = '';
+                        document.getElementById('statusText').textContent = 'Ready';
+                        document.getElementById('startBtn').disabled = false;
+                        document.getElementById('stopBtn').disabled = true;
+                        if (updateInterval) {
+                            clearInterval(updateInterval);
+                            updateInterval = null;
+                        }
+                        isProcessing = false;
+                        showToast('All results cleared!', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error clearing results:', error);
+                        showToast('Error clearing results.', 'error');
+                    });
+            }
+        }
+
+        function downloadResults() {
+            console.log('Download button clicked');
+            
+            const successCount = parseInt(document.getElementById('successCount').textContent);
+            const failedCount = parseInt(document.getElementById('failedCount').textContent);
+            const errorCount = parseInt(document.getElementById('errorCount').textContent);
+            
+            if (successCount === 0 && failedCount === 0 && errorCount === 0) {
+                showToast('No results to download yet!', 'warning');
+                return;
+            }
+            
+            // Open download in new tab
+            window.open('/download_results', '_blank');
+            showToast('Download started!', 'success');
+        }
+
+        function copyResults(type) {
+            console.log(`Copy ${type} button clicked`);
+            
+            fetch('/get_results')
+                .then(response => response.json())
+                .then(data => {
+                    const results = data[type];
+                    if (results.length === 0) {
+                        showToast(`No ${type} results to copy.`, 'warning');
+                        return;
+                    }
+                    
+                    let text = '';
+                    results.forEach(result => {
+                        text += `Username: ${result.username}\n`;
+                        text += `Password: ${result.password}\n`;
+                        if (type === 'success' && result.user_id) {
+                            text += `User ID: ${result.user_id}\n`;
+                        }
+                        text += `Status: ${result.message}\n`;
+                        text += `Premium Config by An0nOtF Technologies Inc\n`;
+                        text += '-'.repeat(30) + '\n\n';
+                    });
+                    
+                    navigator.clipboard.writeText(text).then(() => {
+                        showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} results copied to clipboard!`, 'success');
+                    }).catch(err => {
+                        console.error('Failed to copy:', err);
+                        // Fallback for older browsers
+                        const textarea = document.createElement('textarea');
+                        textarea.value = text;
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(textarea);
+                        showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} results copied to clipboard!`, 'success');
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    showToast('Error fetching results.', 'error');
+                });
+        }
+
+        function startProgressUpdates() {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+            
+            updateInterval = setInterval(() => {
+                updateProgress();
+                updateResults();
+            }, 1000); // Update every second
+        }
+
+        // Save checking statistics
+        function saveCheckStats(results) {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const weekStart = oneWeekAgo.toISOString().split('T')[0];
+            
+            let stats = JSON.parse(localStorage.getItem('ig_checker_stats') || '{}');
+            
+            // Initialize if needed
+            stats.lastCheckDate = stats.lastCheckDate || today;
+            stats.totalChecked = stats.totalChecked || 0;
+            stats.totalSuccess = stats.totalSuccess || 0;
+            stats.totalFailed = stats.totalFailed || 0;
+            stats.todayChecked = stats.todayChecked || 0;
+            stats.todaySuccess = stats.todaySuccess || 0;
+            stats.todayFailed = stats.todayFailed || 0;
+            
+            // If new day, reset daily counters
+            if (stats.lastCheckDate !== today) {
+                stats.lastCheckDate = today;
+                stats.todayChecked = 0;
+                stats.todaySuccess = 0;
+                stats.todayFailed = 0;
+            }
+            
+            // Update stats based on results
+            const totalAccounts = results.success.length + results.failed.length + results.error.length;
+            stats.totalChecked += totalAccounts;
+            stats.todayChecked += totalAccounts;
+            stats.totalSuccess += results.success.length;
+            stats.todaySuccess += results.success.length;
+            stats.totalFailed += results.failed.length + results.error.length;
+            stats.todayFailed += results.failed.length + results.error.length;
+            
+            // Calculate weekly stats (simplified)
+            if (!stats.weekStart || stats.weekStart <= weekStart) {
+                stats.weekStart = today;
+                stats.weekChecked = totalAccounts;
+                stats.weekSuccess = results.success.length;
+                stats.weekFailed = results.failed.length + results.error.length;
+            } else {
+                stats.weekChecked += totalAccounts;
+                stats.weekSuccess += results.success.length;
+                stats.weekFailed += results.failed.length + results.error.length;
+            }
+            
+            // Calculate average check time (simulated)
+            const avgTime = 2.5; // Simulated average seconds per check
+            stats.avgCheckTime = avgTime.toFixed(1);
+            
+            // Add to visitor stats too
+            let visitorStats = JSON.parse(localStorage.getItem('ig_checker_visitor_stats') || '{}');
+            visitorStats.totalChecks = (visitorStats.totalChecks || 0) + totalAccounts;
+            visitorStats.lastCheckTime = now.getTime();
+            localStorage.setItem('ig_checker_visitor_stats', JSON.stringify(visitorStats));
+            
+            localStorage.setItem('ig_checker_stats', JSON.stringify(stats));
+            
+            // Update statistics modal if open
+            updateModalStatistics();
+        }
+
+        function updateProgress() {
+            fetch('/get_progress')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.total > 0) {
+                        const progressPercent = Math.round(data.progress);
+                        document.getElementById('progressCount').textContent = 
+                            `${data.processed}/${data.total}`;
+                        document.getElementById('progressPercent').textContent = 
+                            `${progressPercent}%`;
+                        document.getElementById('progressFill').style.width = 
+                            `${progressPercent}%`;
+                        
+                        if (!data.processing && isProcessing) {
+                            isProcessing = false;
+                            document.getElementById('startBtn').disabled = false;
+                            document.getElementById('stopBtn').disabled = true;
+                            document.getElementById('statusText').textContent = 'Completed';
+                            if (updateInterval) {
+                                clearInterval(updateInterval);
+                                updateInterval = null;
+                            }
+                            showToast('Checking completed!', 'success');
+                            updateResults();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating progress:', error);
+                });
+        }
+
+        function updateResults() {
+            fetch('/get_results')
+                .then(response => response.json())
+                .then(data => {
+                    // Update counts
+                    document.getElementById('successCount').textContent = data.success.length;
+                    document.getElementById('failedCount').textContent = data.failed.length;
+                    document.getElementById('errorCount').textContent = data.error.length;
+                    
+                    // Save statistics
+                    saveCheckStats(data);
+                    
+                    // Update success results
+                    const successPanel = document.getElementById('successResults');
+                    if (data.success.length > 0) {
+                        successPanel.innerHTML = '';
+                        data.success.forEach(result => {
+                            const item = document.createElement('div');
+                            item.className = 'result-item success';
+                            item.innerHTML = `
+                                <strong>${result.username}</strong>:${result.password}
+                                <br><small>${result.message}</small>
+                                <br><small>Premium Config by An0nOtF Technologies Inc</small>
+                            `;
+                            successPanel.appendChild(item);
+                        });
+                    } else {
+                        if (!successPanel.querySelector('.result-item.success:not(:first-child)')) {
+                            successPanel.innerHTML = '<div class="result-item success">No successful logins yet</div>';
+                        }
+                    }
+                    
+                    // Update failed results
+                    const failedPanel = document.getElementById('failedResults');
+                    if (data.failed.length > 0) {
+                        failedPanel.innerHTML = '';
+                        data.failed.forEach(result => {
+                            const item = document.createElement('div');
+                            item.className = 'result-item failed';
+                            item.innerHTML = `
+                                <strong>${result.username}</strong>:${result.password}
+                                <br><small>${result.message}</small>
+                                <br><small>Premium Config by An0nOtF Technologies Inc</small>
+                            `;
+                            failedPanel.appendChild(item);
+                        });
+                    } else {
+                        if (!failedPanel.querySelector('.result-item.failed:not(:first-child)')) {
+                            failedPanel.innerHTML = '<div class="result-item failed">No failed logins yet</div>';
+                        }
+                    }
+                    
+                    // Update error results
+                    const errorPanel = document.getElementById('errorResults');
+                    if (data.error.length > 0) {
+                        errorPanel.innerHTML = '';
+                        data.error.forEach(result => {
+                            const item = document.createElement('div');
+                            item.className = 'result-item error';
+                            item.innerHTML = `
+                                <strong>${result.username}</strong>:${result.password}
+                                <br><small>${result.message}</small>
+                                <br><small>Premium Config by An0nOtF Technologies Inc</small>
+                            `;
+                            errorPanel.appendChild(item);
+                        });
+                    } else {
+                        if (!errorPanel.querySelector('.result-item.error:not(:first-child)')) {
+                            errorPanel.innerHTML = '<div class="result-item error">No errors yet</div>';
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating results:', error);
+                });
+        }
+
+        // Initialize application
+        function initializeApp() {
+            console.log('Initializing Instagram Checker...');
+            
+            // Setup sidebar toggle
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebar.classList.toggle('open');
+                    mainContent.classList.toggle('sidebar-open');
+                });
+            }
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(event) {
+                if (sidebar && menuToggle && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                    mainContent.classList.remove('sidebar-open');
+                }
+            });
+
+            // Setup button event listeners
+            const setupButtonListeners = () => {
+                const startBtn = document.getElementById('startBtn');
+                const stopBtn = document.getElementById('stopBtn');
+                const clearBtn = document.getElementById('clearBtn');
+                const downloadBtn = document.getElementById('downloadBtn');
+                const copySuccessBtn = document.getElementById('copySuccessBtn');
+                const copyFailedBtn = document.getElementById('copyFailedBtn');
+                const copyErrorBtn = document.getElementById('copyErrorBtn');
+                const dashboardBtn = document.getElementById('dashboardBtn');
+                const aboutBtn = document.getElementById('aboutBtn');
+
+                if (startBtn) startBtn.addEventListener('click', startChecking);
+                if (stopBtn) stopBtn.addEventListener('click', stopChecking);
+                if (clearBtn) clearBtn.addEventListener('click', clearAll);
+                if (downloadBtn) downloadBtn.addEventListener('click', downloadResults);
+                if (copySuccessBtn) copySuccessBtn.addEventListener('click', () => copyResults('success'));
+                if (copyFailedBtn) copyFailedBtn.addEventListener('click', () => copyResults('failed'));
+                if (copyErrorBtn) copyErrorBtn.addEventListener('click', () => copyResults('error'));
+                
+                if (dashboardBtn) {
+                    dashboardBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (sidebar) sidebar.classList.remove('open');
+                        if (mainContent) mainContent.classList.remove('sidebar-open');
+                        showToast('Dashboard loaded', 'success');
+                    });
+                }
+                
+                if (aboutBtn) {
+                    aboutBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        // Close sidebar
+                        if (sidebar) sidebar.classList.remove('open');
+                        if (mainContent) mainContent.classList.remove('sidebar-open');
+                        
+                        // Show about modal
+                        const aboutModal = document.getElementById('aboutModal');
+                        if (aboutModal) {
+                            aboutModal.classList.add('show');
+                        }
+                        
+                        // Add close functionality
+                        const closeButtons = document.querySelectorAll('.close-modal');
+                        closeButtons.forEach(button => {
+                            button.addEventListener('click', function() {
+                                aboutModal.classList.remove('show');
+                            });
+                        });
+                        
+                        // Close modal when clicking outside
+                        aboutModal.addEventListener('click', function(e) {
+                            if (e.target === aboutModal) {
+                                aboutModal.classList.remove('show');
+                            }
+                        });
+                        
+                        // Close with Escape key
+                        document.addEventListener('keydown', function(e) {
+                            if (e.key === 'Escape' && aboutModal.classList.contains('show')) {
+                                aboutModal.classList.remove('show');
+                            }
+                        });
+                    });
+                }
+            };
+
+            // Setup textarea shortcut
+            const accountsInput = document.getElementById('accountsInput');
+            if (accountsInput) {
+                accountsInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && e.ctrlKey) {
+                        e.preventDefault();
+                        startChecking();
+                    }
+                });
+            }
+    
+            // Setup all button listeners
+            setupButtonListeners();
+            
+            // Initialize visitor tracking
+            trackVisitorWithSession();
+            
+            // Initialize statistics tab
+            initializeStatisticsTab();
+
+            // Check backend connection
+            checkBackendConnection();
+            
+            // Load initial data
+            updateResults();
+            updateProgress();
+            
+            // Debug: Add click sound feedback
+            document.querySelectorAll('button, .menu a').forEach(element => {
+                element.addEventListener('click', function() {
+                    console.log(`Clicked: ${this.id || this.textContent}`);
+                });
+            });
+
+            console.log('✅ Instagram Checker initialized successfully!');
+        }
+
+        // Wait for DOM to be fully loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // Handle unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            showToast('An unexpected error occurred', 'error');
+        });
+    </script>
+</body>
+</html>
